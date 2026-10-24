@@ -40,3 +40,16 @@ Each lesson is something that went wrong, how it was found, and the fix now buil
 - He asked for the script, then read it in his own words. Plan from the transcript.
 - He gave feedback in small rounds: cut accuracy, the mascot, the last letter, brightness. Keep build fast (seconds) and the render last.
 - Render takes about 8.5 min. Tell him the ETA up front, and never leave a stalled render running. Check that the encoder is getting frames (`video-only.mp4` should grow).
+## Voice-only reel 01 (2026-10-25)
+
+- **English names inside Arabic speech** (Claude Code, Codex, Gemini, install): Whisper dropped them until `--prompt` listed them.
+- **Final-silence invention**: Whisper added "اشتركوا في القناة" over the last 0.5 s of silence. Drop words that start inside the final silence.
+- **`silencedetect` can print a negative first start** (`-0.000583`). A `[\d.]+` regex then misaligns starts and ends, and no pause gets cut. Parse the sign.
+- **Snap stretched word starts**: when a pause sits inside a word's whisper span, the word starts at the pause end. "وهتكون" was 0.35 s early.
+- **RTL captions flip multi-word Latin names** ("Code Claude"). Merge them into one caption token.
+- **Vertical safe band**: text stays between y 168 and 1330 px. Captions sit at y 1150. Below 1330 only decoration, here a live editor-timeline strip.
+- **`hyperframes check` runtime "Navigation timeout of 10000 ms"**: pass `--timeout 30000`.
+- **Layout overlap opt-outs don't inherit**: put `data-layout-allow-overlap` on the text elements themselves, not only on the card.
+- **Pixabay SFX can't be redistributed** as files. The public repo ships CC0 Freesound sounds instead.
+- **Openverse throttles bursts (429)**: `openverse.py` now backs off and retries.
+- **Blender fails on paths over 260 characters** on Windows. Keep `--out` short.

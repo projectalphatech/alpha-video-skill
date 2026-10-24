@@ -34,8 +34,10 @@ Before building any video, write a 5-line brief: goal, hook, proof, call to acti
 2. Drop words that start inside the final silence (Whisper invents "subscribe to the channel" there).
 3. Tighten pauses over 0.4 s down to ~0.28 s: keep 0.2 s after the voice drops, plus 30 ms fades. Snap word starts that Whisper stretched into a pause to the pause end.
 4. Voice chain: high-pass 80 Hz, light FFT denoise, compressor 3:1, presence +2 dB at 3.5 kHz, loudnorm -15 LUFS.
+   Steps 2-4 in one command: `python -I SKILL/tools/voice_prep.py <audio> raw_words.json --fixes fixes.json`.
 5. Build a HyperFrames 1080x1920 project: one scene per beat, each element timed to its word, plus one captions host.
-6. Run check, then snapshots, then preview, then render.
+6. Run `npx hyperframes check --json --timeout 30000` (0 errors), then snapshots, then preview, then render.
+7. RTL captions: merge multi-word Latin names (e.g. "Claude Code") into one token, or their order flips.
 
 ## Mode B: code only (HyperFrames)
 

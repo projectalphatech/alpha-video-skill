@@ -3,7 +3,7 @@ rendered as a transparent PNG sequence to drop into a HyperFrames scene or an ff
 
 run (Windows):
   "C:/Program Files/Blender Foundation/Blender 5.2/blender.exe" -b --factory-startup -P blender/logo3d.py -- \
-      --text "PROJECT ALPHA" --out D:/Projects/<p>/assets/3d/title --frames 90 --fps 30 --res 1080x1080
+      --text "PROJECT ALPHA" --out assets/3d/title --frames 90 --fps 30 --res 1080x1080
   --svg logo.svg      extrude an SVG logo instead of text (flat colours, closed paths)
   --color #1f7bff     material colour     --metal 0.6 --rough 0.25
   --move orbit|push|spin   camera/object move (default orbit)
@@ -136,6 +136,8 @@ sc.render.film_transparent = True
 sc.render.image_settings.file_format = "PNG"
 sc.render.image_settings.color_mode = "RGBA"
 sc.view_settings.view_transform = "AgX" if "AgX" in [i.identifier for i in sc.view_settings.bl_rna.properties["view_transform"].enum_items] else "Filmic"
+if len(os.path.abspath(a.out)) > 200:
+    sys.exit(f"[logo3d] output path too long ({len(os.path.abspath(a.out))} chars): Windows/Blender fail past 260. Use a short --out.")
 os.makedirs(a.out, exist_ok=True)
 sc.render.filepath = os.path.join(os.path.abspath(a.out), "")
 bpy.ops.render.render(animation=True)

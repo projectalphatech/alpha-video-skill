@@ -34,7 +34,7 @@ else:
     params["license_type"] = "commercial"
 if a.kind == "audio" and a.max_sec:
     params["duration"] = "short" if a.max_sec <= 240 else "medium"
-url = f"{API}/{a.kind}/?{urllib.parse.urlencode(params)}"
+url = f"{API}/{'audio' if a.kind == 'audio' else 'images'}/?{urllib.parse.urlencode(params)}"
 def fetch(u, tries=4):  # anonymous API throttles bursts (429): back off and retry
     import time
     for k in range(tries):

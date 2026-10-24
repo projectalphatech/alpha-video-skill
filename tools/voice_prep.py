@@ -36,6 +36,8 @@ last_voice = max([s for s in ss if s < dur - 0.2] or [dur])
 words = [w for w in words if w["start"] < last_voice - 0.02]
 
 segs, cur = [], 0.0
+if ss and ss[0] < 0.05 and se[0] > 0.2:  # leading silence: the hook must start at once
+    cur = max(0.0, se[0] - 0.1)
 for s0, s1 in zip(ss, se):
     if s0 < 0.3 or s1 > dur - 0.05 or s1 - s0 < a.min_gap:
         continue

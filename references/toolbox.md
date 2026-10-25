@@ -17,6 +17,10 @@ Verdict: **IN** = wired into this skill. **ENGINE** = installed plugin this skil
 | 8/12 | Blender 5.2 LTS (installed) | GPL (output is ours) | IN | `blender/logo3d.py`: an extruded 3D title or SVG logo with studio light and an orbit, push or spin move, rendered as a transparent PNG sequence. For complex 3D devices, prefer Three.js inside HyperFrames (`3d-device-recipes.md`): it is faster to iterate and deterministic per frame. |
 | 9 | [Openverse API](https://api.openverse.org) ([WordPress/openverse](https://github.com/WordPress/openverse), MIT) | per item: CC0 / CC BY / ... | IN | `tools/openverse.py`: free real SFX (Freesound), music and images. No key needed (about 100 requests a day anonymous). CC BY items need credit, which goes in `CREDITS.md` automatically. |
 | 10 | "Real SFX" | - | IN | No single repo is worth it (the GitHub hits had 0 stars). Real recorded SFX come from Openverse/Freesound CC0 (#9). Save them in `~/.alpha-video/sfx` so CLAP indexes them. Generated SFX come from ElevenLabs. Synthetic SFX come from `sfx.py`. |
+| 13 | [WyattBlue/auto-editor](https://github.com/WyattBlue/auto-editor) | Unlicense | IN | `tools/declutter.py`: finds silences by loudness (any language) and renders the final cut list in one pass (`--edit none --cut-out a,b ...`). The pip package downloads its own binary on first run. |
+| 14 | [linto-ai/whisper-timestamped](https://github.com/linto-ai/whisper-timestamped) | GPL-3.0 (we only call it, nothing vendored) | IN | `tools/declutter.py`: `detect_disfluencies=True` marks hesitations as `[*]` words. Plain Whisper drops ums, so this plus an Arabic/English filler list finds them. Uses openai-whisper weights (large-v3, ~3 GB, separate from faster-whisper's). |
+| - | nyrahealth/CrisperWhisper | MIT code, **non-commercial weights** | REF | Best published filler capture, but client reels are commercial use. Arabic not proven. |
+| - | louisedesadeleer/cut-video, b2bvic/declip | MIT | REF | Ideas taken: browser review before render, never pad a cut into the next word. English-only fillers, macOS-first. |
 | 11 | ElevenLabs API | paid account | IN | `tools/eleven.py`: TTS (multilingual v2), sound generation and music. The key goes in `~/.alpha-video/.env`. |
 
 ## Engines and helpers already installed (driven by this skill)
@@ -36,7 +40,6 @@ Verdict: **IN** = wired into this skill. **ENGINE** = installed plugin this skil
 | [prompt-motion.com](https://prompt-motion.com/) | prompts belong to their posters | **Reference gallery** (added 2026-10-25): ~230 Claude-made motion videos, each with its prompt, model, effort and category tags. Look at it before Mode B work; adapt prompts, never repost others' videos. |
 | [wide-trace/open-higgsfield](https://github.com/wide-trace/open-higgsfield) | none | A UI over paid AI video models. Reference only. Call the model APIs directly if live-action AI shots are ever needed. |
 | browser-use/video-use | MIT | Needs an ElevenLabs key for transcription. We borrowed its rules (30 ms fades, self-check at every cut). |
-| WyattBlue/auto-editor | Unlicense | A silence-cut CLI that `reel cut` covers. |
 | pycodebr/heditor | - | Reel style names. Use it as a source of ideas only. |
 
 ## Higgsfield-style camera grammar

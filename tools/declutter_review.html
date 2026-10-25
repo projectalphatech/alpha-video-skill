@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Declutter review</title>
+<style>
+:root{--bg:#0f1115;--card:#181b21;--ink:#e8eaed;--mute:#8a919c;--line:#2a2f37;--accent:#25d366;--filler:#ffb347;--maybe:#c9a0ff;--disfluency:#ff6b7a;--silence:#5aa9ff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 system-ui,"Segoe UI",Tahoma,sans-serif}
+.wrap{display:grid;grid-template-columns:minmax(0,1fr) 440px;gap:16px;padding:16px;height:100vh}
+@media (max-width:900px){.wrap{grid-template-columns:1fr;height:auto}}
+.left{display:flex;flex-direction:column;gap:10px;min-height:0}
+video{width:100%;max-height:70vh;background:#000;border-radius:8px}
+.bar{position:relative;height:28px;background:var(--card);border-radius:6px;cursor:pointer;overflow:hidden}
+.bar i{position:absolute;top:0;bottom:0;opacity:.85}
+.bar i.off{opacity:.18}
+.bar .head{position:absolute;top:0;bottom:0;width:2px;background:#fff}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:7px 12px;font:inherit;cursor:pointer}
+button:hover{border-color:var(--mute)}
+button.primary{background:var(--accent);color:#06210f;border-color:var(--accent);font-weight:600}
+button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.stat{color:var(--mute)}
+.list{overflow:auto;background:var(--card);border-radius:8px;min-height:0}
+.item{display:grid;grid-template-columns:24px 86px 1fr auto;gap:8px;align-items:center;padding:7px 10px;border-bottom:1px solid var(--line)}
+.item.now{background:#232832}
+.item .t{color:var(--mute);font-variant-numeric:tabular-nums;font-size:13px}
+.item .w{unicode-bidi:plaintext;font-size:17px}
+.tag{font-size:11px;padding:1px 6px;border-radius:9px;color:#111;margin-inline-end:6px}
+.filler{background:var(--filler)}.maybe{background:var(--maybe)}.disfluency{background:var(--disfluency)}.silence{background:var(--silence)}
+.item button{padding:3px 9px}
+.help{color:var(--mute);font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="left">
+    <video id="v" src="/video" controls preload="auto"></video>
+    <div class="bar" id="bar" title="Click to seek"><div class="head" id="head"></div></div>
+    <div class="row">
+      <button id="prev" title="Play the edit as it will render (skips ticked cuts)">▶ Preview edit</button>
+      <button id="raw">▶ Play original</button>
+      <span class="stat" id="stat"></span>
+    </div>
+    <div class="row" id="kinds"></div>
+    <p class="help">Ticked = cut. <b>maybe</b> words (يعني، آه = "yes") start unticked: listen, then tick. Click a row to hear it with 1 s around it. Keys: Space play/pause, ↑/↓ move, X toggle.</p>
+    <div class="row"><button class="primary" id="save">Save &amp; finish</button><button id="saveOnly">Save</button><span class="stat" id="msg"></span></div>
+  </div>
+  <div class="list" id="list" role="list"></div>
+</div>
+<script>
+const v = document.getElementById("v"), list = document.getElementById("list"), bar = document.getElementById("bar");
+let cuts = [], cur = -1, mode = null, stopAt = null;
+const fmt = s => { const m = Math.floor(s / 60); return m + ":" + (s % 60).toFixed(2).padStart(5, "0"); };
+
+fetch("/plan.json").then(r => r.json()).then(p => { cuts = p.cuts; draw(); });
+
+function draw() {
+  list.innerHTML = cuts.map((c, i) => `<div class="item" role="listitem" data-i="${i}">
+    <input type="checkbox" ${c.on ? "checked" : ""} aria-label="cut ${i}">
+    <span class="t">${fmt(c.start)}</span>
+    <span class="w"><span class="tag ${c.kind}">${c.kind}</span>${c.text.replace(/</g, "&lt;")}</span>
+    <button title="Play around this cut">▶</button></div>`).join("");
+  const kinds = [...new Set(cuts.map(c => c.kind))];
+  document.getElementById("kinds").innerHTML = kinds.map(k =>
+    `<button data-k="${k}"><span class="tag ${k}">${k}</span>${cuts.filter(c => c.kind === k).length} · tick/untick all</button>`).join("");
+  v.addEventListener("loadedmetadata", marks, { once: true }); if (v.duration) marks();
+  stat();
+}
+function marks() {
+  bar.querySelectorAll("i").forEach(e => e.remove());
+  cuts.forEach(c => { const e = document.createElement("i"); e.className = c.kind + (c.on ? "" : " off");
+    e.style.left = (c.start / v.duration * 100) + "%"; e.style.width = Math.max(0.15, (c.end - c.start) / v.duration * 100) + "%"; bar.appendChild(e); });
+}
+function stat() {
+  // merged length of ticked ranges (silence and filler ranges can overlap)
+  const r = cuts.filter(c => c.on).map(c => [c.start, c.end]).sort((a, b) => a[0] - b[0]);
+  let tot = 0, e = -1; for (const [a, b] of r) { if (b > e) { tot += b - Math.max(a, e); e = b; } }
+  document.getElementById("stat").textContent = `${r.length} cuts on · removes ${tot.toFixed(1)} s` + (v.duration ? ` of ${v.duration.toFixed(1)} s` : "");
+}
+function select(i) {
+  cur = i; list.querySelectorAll(".item").forEach(e => e.classList.toggle("now", +e.dataset.i === i));
+  list.querySelector(`[data-i="${i}"]`)?.scrollIntoView({ block: "nearest" });
+}
+function playAround(i) { select(i); const c = cuts[i]; mode = "raw"; stopAt = c.end + 1; v.currentTime = Math.max(0, c.start - 1); v.play(); }
+function toggle(i) { cuts[i].on = !cuts[i].on; list.querySelector(`[data-i="${i}"] input`).checked = cuts[i].on; marks(); stat(); }
+
+list.addEventListener("click", e => {
+  const row = e.target.closest(".item"); if (!row) return; const i = +row.dataset.i;
+  if (e.target.matches("input")) { cuts[i].on = e.target.checked; marks(); stat(); return; }
+  playAround(i);
+});
+document.getElementById("kinds").addEventListener("click", e => {
+  const k = e.target.closest("button")?.dataset.k; if (!k) return;
+  const all = cuts.filter(c => c.kind === k), on = !all.every(c => c.on); all.forEach(c => c.on = on); draw();
+});
+document.getElementById("prev").onclick = () => { mode = "edit"; stopAt = null; v.play(); };
+document.getElementById("raw").onclick = () => { mode = "raw"; stopAt = null; v.play(); };
+bar.onclick = e => { const r = bar.getBoundingClientRect(); v.currentTime = (e.clientX - r.left) / r.width * v.duration; };
+
+v.addEventListener("timeupdate", () => {
+  const t = v.currentTime;
+  document.getElementById("head").style.left = (t / v.duration * 100) + "%";
+  if (stopAt != null && t >= stopAt) { v.pause(); stopAt = null; }
+  if (mode === "edit") { const c = cuts.find(c => c.on && t >= c.start && t < c.end - 0.02); if (c) v.currentTime = c.end; }
+});
+document.addEventListener("keydown", e => {
+  if (e.target.matches("input,button") && e.key === " ") return;
+  if (e.key === " ") { e.preventDefault(); v.paused ? v.play() : v.pause(); }
+  else if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); const i = Math.min(cuts.length - 1, Math.max(0, cur + (e.key === "ArrowDown" ? 1 : -1))); playAround(i); }
+  else if ((e.key === "x" || e.key === "X") && cur >= 0) toggle(cur);
+});
+async function save(path) {
+  const r = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ cuts }) });
+  document.getElementById("msg").textContent = r.ok ? (path === "/done" ? "Saved. You can close this tab." : "Saved.") : "Save failed";
+}
+document.getElementById("save").onclick = () => save("/done");
+document.getElementById("saveOnly").onclick = () => save("/save");
+</script>
+</body>
+</html>

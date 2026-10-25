@@ -22,6 +22,11 @@ Before building any video, write a 5-line brief: goal, hook, proof, call to acti
 
 `node SKILL/reel/scripts/reel.mjs <step> --dir <project>`. Per-video choices live in the project's `reel.config.mjs`. Worked example: `reel/templates/reel.config.mjs`.
 
+0. Long or messy take (ums, اممم, آآ, long pauses)? Declutter it first, then use `clean.mp4` as the video:
+   `PY -I SKILL/tools/declutter.py plan <video>`, then `review <video>_declutter` (the user ticks cuts in the browser and presses Save & finish; run it in the background and wait), then `render <video>_declutter`. Never render before the user saves the review.
+   Whisper cannot spell English words inside Arabic speech, so `[*]` "hesitations" can be real words ("AI agent" was cut once). Play every `[*]` in review. Silences that overlap a word start unticked.
+   Always ask for the original phone file (sent as a document). WhatsApp copies are ~464 px wide and look soft once zoomed into the split screen.
+   Graphics on top, speaker at the bottom: `layout: "camBottom"` in the config. A take with few jump cuts gets its zoom rhythm from `zoomCuts: (h, B) => [...]`. Use `grade.denoise: false` on phone footage.
 1. Run `init "<video>" <projectDir>`. Then set `face: {x, y}` from `assets/face-check.jpg`.
 2. Run `transcribe`. Read `transcript.md`: the transcript is the script. Add `fixes` and `merges` for misheard words.
 3. Plan the beats and one scene per beat with the user. Write the config.
@@ -56,6 +61,7 @@ Use named camera moves instead of the word "cinematic": dolly push, crash zoom, 
 | Need | Command (from SKILL) |
 |---|---|
 | Transcribe, word timings | `PY reel/scripts/py/transcribe.py <media> words.json transcript.md --lang ar --prompt "names"` |
+| Cut fillers + silences (review first) | `PY -I tools/declutter.py plan <video> --prompt "names"`, then `review <dir>`, then `render <dir>`. `--fillers "يعني"` always cuts a word |
 | Voiceover | `PY tools/eleven.py tts @script.txt voice.mp3`. Transcribe it back to check names |
 | Generated SFX / music | `PY tools/eleven.py sfx "glass whoosh" out.mp3 --sec 2` / `music "<prompt>" bed.mp3 --sec 30` |
 | Free real SFX (CC0) | `python tools/openverse.py audio "camera shutter" --cc0 --max-sec 4 --get 1 --out ~/.alpha-video/sfx` |

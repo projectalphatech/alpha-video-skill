@@ -61,7 +61,13 @@ const steps = {
 `);
       sh(PY, ["-m", "pip", "install", "-q", "demucs", "-c", c, "--extra-index-url", "https://download.pytorch.org/whl/cpu"]);
     }
-    sh(PY, ["-c", "import faster_whisper, torch, transformers, demucs; print('[reel] python env ok')"]);
+    // declutter tool: filler + silence cutter (tools/declutter.py)
+    if (spawnSync(PY, ["-c", "import whisper_timestamped, auto_editor"]).status !== 0) {
+      const c = path.join(VENV, "torch-pin.txt");
+      if (!fs.existsSync(c)) fs.writeFileSync(c, "torch==" + execFileSync(PY, ["-c", "import torch; print(torch.__version__)"], { encoding: "utf8" }).trim() + "\n");
+      sh(PY, ["-m", "pip", "install", "-q", "auto-editor", "whisper-timestamped", "-c", c, "--extra-index-url", "https://download.pytorch.org/whl/cpu"]);
+    }
+    sh(PY, ["-c", "import faster_whisper, torch, transformers, demucs, whisper_timestamped, auto_editor; print('[reel] python env ok')"]);
     const blender = "C:/Program Files/Blender Foundation";
     say("blender", fs.existsSync(blender) ? fs.readdirSync(blender).join(", ") : "not installed (optional, for 3D titles)");
   },
@@ -69,6 +75,9 @@ const steps = {
   init([video, dir]) {
     if (!video || !dir) throw new Error("usage: init <video> <projectDir>");
     const proj = path.resolve(dir), parent = path.dirname(proj), name = path.basename(proj);
+    // a folder that already holds a different project (index.html but no reel.config.mjs) must not be reused
+    if (fs.existsSync(path.join(proj, "index.html")) && !fs.existsSync(path.join(proj, "reel.config.mjs")))
+      throw new Error(`${proj} already holds another project - pick a new folder`);
     fs.mkdirSync(parent, { recursive: true });
     if (!fs.existsSync(path.join(proj, "index.html")))
       npx(["hyperframes", "init", name, "--example", "blank", "--resolution", "portrait", "--skip-transcribe", "--non-interactive"], { cwd: parent, env: { ...process.env, HYPERFRAMES_SKIP_SKILLS: "1" } });

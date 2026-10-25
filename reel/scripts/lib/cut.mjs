@@ -34,7 +34,8 @@ export function gradeChain(face, src, g = {}) {
   const eq = `eq=brightness=${g.brightness ?? 0.03}:contrast=${g.contrast ?? 1.08}:saturation=${g.saturation ?? 1.3}:gamma=${g.gamma ?? 1.18}`;
   const warm = g.warm === false ? "" : ",colorbalance=rs=0.03:bs=-0.03:rm=0.04:bm=-0.04";
   if (g.off) return "[v]null[vg]";
-  return `[v]hqdn3d=2:1.5:4:3,split[o][b];[b]curves=all='${curve}'[lit];` +
+  // denoise smooths detail: skip it (grade.denoise false) on low-res or already-compressed footage
+  return `[v]${g.denoise === false ? "" : "hqdn3d=2:1.5:4:3,"}split[o][b];[b]curves=all='${curve}'[lit];` +
     `color=c=black:s=${w}x${h}:d=1,format=yuv420p,geq=lum='${E}':cb='${E}':cr='${E}'[m];` +
     `[o][lit][m]maskedmerge,${eq}${warm},curves=all='0/0 0.07/0.045 1/1',unsharp=5:5:0.4[vg]`;
 }

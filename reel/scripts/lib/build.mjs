@@ -1,4 +1,4 @@
-// Split-screen reel engine: speaker on top (crop, jump-cut zooms, punches, flashes,
+// Split-screen reel engine: speaker on top, or at the bottom with layout: "camBottom" (crop, jump-cut zooms, punches, flashes,
 // karaoke captions), explainer scenes at the bottom, SFX and a ducked music bed.
 // Everything video-specific comes from the project's reel.config.mjs.
 import fs from "node:fs";
@@ -23,11 +23,11 @@ export function helpers(words, DUR, C) {
 const fontFace = fam => `@font-face{font-family:"${fam}";src:url("assets/fonts/ReadexPro.ttf") format("truetype");font-weight:200 700;}`;
 
 // Shared UI kit for the bottom explainer: WhatsApp-style chat cards, bubbles, stamps, chips.
-const baseCss = (C, dir, fam) => `
+const baseCss = (C, dir, fam, stageTop = 960) => `
 ${fontFace(fam)}
 #root{position:absolute;inset:0;width:1080px;height:1920px;overflow:hidden;font-family:"${fam}",sans-serif;color:${C.ink};direction:${dir};}
 #root *{box-sizing:border-box;}
-.stage{position:absolute;left:0;right:0;top:960px;height:960px;}
+.stage{position:absolute;left:0;right:0;top:${stageTop}px;height:960px;}
 .card{position:absolute;left:90px;right:90px;background:${C.card};border-radius:36px;border:2px solid #1f2c34;box-shadow:0 30px 80px rgba(0,0,0,.45);overflow:hidden;}
 .hdr{display:flex;align-items:center;gap:22px;padding:22px 30px;background:#202c33;}
 .av{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:700;color:#0b141a;flex:none;}
@@ -140,7 +140,9 @@ export function build(proj, cfg, { sfxLen = {} } = {}) {
   const h = helpers(words, DUR, C);
   h.B = { ...cfg.beats(h), end: DUR };
   const B = h.B;
-  const base = baseCss(C, dir, fam);
+  // camBottom: explainer scenes on top, speaker at the bottom
+  const camTop = cfg.layout === "camBottom" ? 960 : 0, stageTop = 960 - camTop;
+  const base = baseCss(C, dir, fam, stageTop);
 
   fs.mkdirSync(P("compositions"), { recursive: true });
   for (const f of fs.readdirSync(P("compositions"))) if (/^s-.*\.html$/.test(f)) fs.rmSync(P("compositions/" + f));
@@ -154,13 +156,15 @@ export function build(proj, cfg, { sfxLen = {} } = {}) {
   });
   h.FROM = 0;
 
-  const cap = captionsFile(words, B, DUR, C, cfg.captions, fam, dir, lang);
+  const cap = captionsFile(words, B, DUR, C, { top: camTop ? 1000 : 760, ...cfg.captions }, fam, dir, lang);
   fs.writeFileSync(P("compositions/captions.html"), cap.html);
 
-  // camera: crop the 16:9 source to the 1080x960 top half, centred on the face
+  // camera: crop the source to the 1080x960 camera half, centred on the face
   const cam = { wide: 0.95, tight: 1.22, push: 1.035, punch: 1.14, ...(cfg.camera || {}) };
   const face = cfg.face, faceY = cfg.faceTargetY ?? 500;
   const punches = (cfg.punches ? cfg.punches(h) : []).filter(t => t >= 0 && t < DUR);
+  // wide/tight switches: every jump cut, plus extra times from cfg.zoomCuts (a take with few cuts still gets a montage rhythm)
+  const zoomCuts = [...new Set([...edl.cuts, ...(cfg.zoomCuts ? cfg.zoomCuts(h, B) : [])].map(t => +(+t).toFixed(3)))].filter(t => t >= 0 && t < DUR - 0.3).sort((a, b) => a - b);
   const flashes = (cfg.flashes || []).map(b => B[b]);
   const hosts = scenes.map(s => `      <div id="h-${s.id}" class="clip" data-composition-id="${s.id}" data-composition-src="compositions/${s.id}.html" data-start="${s.start.toFixed(3)}" data-duration="${s.dur.toFixed(3)}" data-track-kind="graphics" data-track-index="2"></div>`).join("\n");
 
@@ -187,11 +191,12 @@ export function build(proj, cfg, { sfxLen = {} } = {}) {
       * { margin: 0; padding: 0; box-sizing: border-box; }
       html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: ${C.bg}; }
       #root { position: relative; width: 1080px; height: 1920px; font-family: "${fam}", sans-serif; }
-      #panel { position: absolute; left: 0; right: 0; top: 960px; height: 960px; background: radial-gradient(900px 500px at 50% 30%, ${C.panelGlow ?? "#143225"} 0%, ${C.bg} 70%); }
-      #cam { position: absolute; left: 0; top: 0; width: 1080px; height: 960px; overflow: hidden; background: #000; }
+      #panel { position: absolute; left: 0; right: 0; top: ${stageTop}px; height: 960px; background: radial-gradient(900px 500px at 50% 30%, ${C.panelGlow ?? "#143225"} 0%, ${C.bg} 70%); }
+      #cam { position: absolute; left: 0; top: ${camTop}px; width: 1080px; height: 960px; overflow: hidden; background: #000; }
       #camzoom { position: absolute; left: ${540 - face.x}px; top: ${faceY - face.y}px; width: ${cfg.srcW ?? 1920}px; height: ${cfg.srcH ?? 1080}px; }
       #talk { width: ${cfg.srcW ?? 1920}px; height: ${cfg.srcH ?? 1080}px; display: block; }
       #flash { position: absolute; left: 0; top: 0; width: 1080px; height: 960px; background: #fff; opacity: 0; }
+      #camshade { position: absolute; left: 0; right: 0; top: ${camTop}px; height: 300px; background: linear-gradient(rgba(5,10,14,.72), rgba(5,10,14,0)); }
       #seam { position: absolute; left: 0; right: 0; top: 957px; height: 6px; background: ${C.green}; box-shadow: 0 0 30px ${C.green}; }
     </style>
   </head>
@@ -204,6 +209,7 @@ export function build(proj, cfg, { sfxLen = {} } = {}) {
         </div>
         <div id="flash"></div>
       </div>
+      ${camTop ? `<div id="camshade"></div>` : ""}
       <div id="seam"></div>
 ${hosts}
       <div id="h-captions" class="clip" data-composition-id="captions" data-composition-src="compositions/captions.html" data-start="0" data-duration="${DUR}" data-track-kind="captions" data-track-index="3"></div>
@@ -213,7 +219,7 @@ ${bgm}
     <script>
       (function () {
         var tl = gsap.timeline({ paused: true });
-        var cuts = ${JSON.stringify(edl.cuts)}, punches = ${JSON.stringify(punches)}, flashes = ${JSON.stringify(flashes)}, DUR = ${DUR};
+        var cuts = ${JSON.stringify(zoomCuts)}, punches = ${JSON.stringify(punches)}, flashes = ${JSON.stringify(flashes)}, DUR = ${DUR};
         var WIDE = ${cam.wide}, TIGHT = ${cam.tight}, PUSH = ${cam.push}, PUNCH = ${cam.punch};
         var cz = document.getElementById("camzoom");
         gsap.set(cz, { transformOrigin: "${face.x}px ${face.y}px", scale: WIDE });

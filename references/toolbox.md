@@ -21,6 +21,7 @@ Verdict: **IN** = wired into this skill. **ENGINE** = installed plugin this skil
 | 14 | [linto-ai/whisper-timestamped](https://github.com/linto-ai/whisper-timestamped) | GPL-3.0 (we only call it, nothing vendored) | IN | `tools/declutter.py`: `detect_disfluencies=True` marks hesitations as `[*]` words. Plain Whisper drops ums, so this plus an Arabic/English filler list finds them. Uses openai-whisper weights (large-v3, ~3 GB, separate from faster-whisper's). |
 | - | nyrahealth/CrisperWhisper | MIT code, **non-commercial weights** | REF | Best published filler capture, but client reels are commercial use. Arabic not proven. |
 | - | louisedesadeleer/cut-video, b2bvic/declip | MIT | REF | Ideas taken: browser review before render, never pad a cut into the next word. English-only fillers, macOS-first. |
+| 15 | [yt-dlp/yt-dlp](https://github.com/yt-dlp/yt-dlp) (+ `yt-dlp-ejs` YouTube solver, Node runtime) | Unlicense | IN | `tools/fetch_ref.py` (added 2026-10-26): downloads reference reels and our own posted videos from YouTube/Instagram/TikTok/Facebook/X as H.264 mp4. It then measures shot changes with ffmpeg (`cuts.txt`, `sheet.jpg`) so we can match the pacing. Third-party videos are study-only. Sites change often, so update monthly with `pip install -U "yt-dlp[default]"`. |
 | 11 | ElevenLabs API | paid account | IN | `tools/eleven.py`: TTS (multilingual v2), sound generation and music. The key goes in `~/.alpha-video/.env`. |
 
 ## Engines and helpers already installed (driven by this skill)

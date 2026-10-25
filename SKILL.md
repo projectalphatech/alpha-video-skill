@@ -16,6 +16,7 @@ First time on a machine: `node SKILL/reel/scripts/reel.mjs setup` (needs ffmpeg,
 | An audio file of their voice (voice note, podcast clip) | **A2. Voice only**: full-screen scenes driven by the words |
 | A website, product or idea, with no footage | **B. Code only**: HyperFrames |
 
+The user pastes a reel/video URL as a reference ("make it like this")? Fetch it first with `tools/fetch_ref.py`, read `cuts.txt` and `sheet.jpg`, and copy the pacing and structure, never the footage.
 Before building any video, write a 5-line brief: goal, hook, proof, call to action, format. Then confirm the plan with the user. **Understand the recording first**: transcribe it, read every line and map it to beats before designing anything.
 
 ## Mode A1: talking head
@@ -70,6 +71,7 @@ Use named camera moves instead of the word "cinematic": dolly push, crash zoom, 
 | Local music bed | `PY reel/scripts/py/bgm.py out.wav "<prompt>" 28` (MusicGen, ~5 min CPU) |
 | Beat grid / procedural SFX | `PY studio/scripts/beats.py <music>` gives `cues.json`; `studio/scripts/sfx_mix.py` |
 | Split voice and music | `PY tools/stems.py <file>` (Demucs) |
+| Reference / own posted video from a URL | `python -I tools/fetch_ref.py <url> --out <project>/refs` gives `video.mp4`, `info.json`, `cuts.txt` (shot times, avg shot length), `sheet.jpg` (one frame per shot). `--audio` WAV only, `--subs` captions, `--cookies chrome` for Instagram/Facebook. Needs `pip install -U "yt-dlp[default]"`; update it monthly |
 | 3D title | `blender -b --factory-startup -P blender/logo3d.py -- --text "..." --out <short dir>`, then a VP9-alpha webm |
 
 Keys (optional) live in `~/.alpha-video/.env`: `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID`. Never commit them.
@@ -79,6 +81,7 @@ Keys (optional) live in `~/.alpha-video/.env`: `ELEVENLABS_API_KEY`, `ELEVENLABS
 - Never cut a word's tail. Cut on audio level, not on Whisper word ends.
 - No invented numbers, testimonials or names on screen.
 - Use only licensed assets: MIT/CC0/CC BY/OFL, or your own generated ones. Credit CC BY.
+- Videos fetched with `fetch_ref.py` are for study (pacing, hooks, captions) unless they are ours. Never put their footage or music in a published reel.
 - Look at frames around every cut before the final render. A fast effect can fall between frames.
 - Vertical text stays between y 168 and 1330 px, because the app's UI covers the rest.
 - On Windows, render with `--no-browser-gpu` if GPU capture times out. Keep Blender output paths short (under 260 characters).

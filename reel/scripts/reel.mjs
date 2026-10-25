@@ -75,6 +75,9 @@ const steps = {
   init([video, dir]) {
     if (!video || !dir) throw new Error("usage: init <video> <projectDir>");
     const proj = path.resolve(dir), parent = path.dirname(proj), name = path.basename(proj);
+    // a folder that already holds a different project (index.html but no reel.config.mjs) must not be reused
+    if (fs.existsSync(path.join(proj, "index.html")) && !fs.existsSync(path.join(proj, "reel.config.mjs")))
+      throw new Error(`${proj} already holds another project - pick a new folder`);
     fs.mkdirSync(parent, { recursive: true });
     if (!fs.existsSync(path.join(proj, "index.html")))
       npx(["hyperframes", "init", name, "--example", "blank", "--resolution", "portrait", "--skip-transcribe", "--non-interactive"], { cwd: parent, env: { ...process.env, HYPERFRAMES_SKIP_SKILLS: "1" } });

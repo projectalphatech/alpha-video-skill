@@ -33,6 +33,7 @@ Verdict: **IN** = wired into this skill. **ENGINE** = installed plugin this skil
 | Repo | Licence | Why not |
 |---|---|---|
 | [yihui-dev/awesome-opus5-5-videos](https://github.com/yihui-dev/awesome-opus5-5-videos) | MIT | Kept as an **idea bank**: search its `data/videos.json` (703 prompts) for a format, then adapt it. |
+| [prompt-motion.com](https://prompt-motion.com/) | prompts belong to their posters | **Reference gallery** (added 2026-10-25): ~230 Claude-made motion videos, each with its prompt, model, effort and category tags. Look at it before Mode B work; adapt prompts, never repost others' videos. |
 | [wide-trace/open-higgsfield](https://github.com/wide-trace/open-higgsfield) | none | A UI over paid AI video models. Reference only. Call the model APIs directly if live-action AI shots are ever needed. |
 | browser-use/video-use | MIT | Needs an ElevenLabs key for transcription. We borrowed its rules (30 ms fades, self-check at every cut). |
 | WyattBlue/auto-editor | Unlicense | A silence-cut CLI that `reel cut` covers. |

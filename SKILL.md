@@ -46,6 +46,7 @@ Engine: [HyperFrames](https://github.com/heygen-com/hyperframes) (`npx hyperfram
 - 3D phone/laptop with real screens: `references/3d-device-recipes.md`.
 - 3D title or logo: Blender, below.
 - Film looks: [lemo-opuscar](https://github.com/lemomo-ai/lemo-opuscar) styles.
+- References before building: [prompt-motion.com](https://prompt-motion.com/) is a gallery of Claude-made motion videos with the prompt behind each one. Filter by category (Product UI, Phone, Charts, Diagrams, Kinetic type, Particles, Code...), watch 2-3 close to the brief, then adapt their prompts. Each page is server-rendered: `curl -sL https://prompt-motion.com/<slug>` holds the prompt text; the home page lists every `/<slug>`.
 
 Pipeline: story, then look, then build, then voice, then music, then beat grid, then SFX on cues, then check/snap, then the user's OK, then render (-14 LUFS).
 Use named camera moves instead of the word "cinematic": dolly push, crash zoom, slow orbit, whip pan.

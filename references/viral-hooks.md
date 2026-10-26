@@ -79,7 +79,8 @@
 ## Proof / result
 - 15 (12.0M) I did it. I […big result] on a single […].
 - 42 (4.1M) Never underestimate how fast […] changes. […] days ago I had […small], today […big].
-- 40 (4.5M) I paid […$] to learn this in […], I'll teach it free while I […casual].- 98 (270K) This […person] built […big] in […time], but he's still […unexpected].
+- 40 (4.5M) I paid […$] to learn this in […], I'll teach it free while I […casual].
+- 98 (270K) This […person] built […big] in […time], but he's still […unexpected].
 - 59 (2.0M) […AI tool] is recommending my business to people looking for […]. I didn't pay for that.
 - 81 (822K) How I […result] every day, very easily, as a busy […].
 - 41 (4.3M) I've never told anyone this, but […] years ago when I was trying to […], I […secret].

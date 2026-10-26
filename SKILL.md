@@ -17,7 +17,7 @@ First time on a machine: `node SKILL/reel/scripts/reel.mjs setup` (needs ffmpeg,
 | A website, product or idea, with no footage | **B. Code only**: HyperFrames |
 
 The user pastes a reel/video URL as a reference ("make it like this")? Fetch it first with `tools/fetch_ref.py`, read `cuts.txt` and `sheet.jpg`, and copy the pacing and structure, never the footage.
-Before building any video, write a 5-line brief: goal, hook, proof, call to action, format. Then confirm the plan with the user. **Understand the recording first**: transcribe it, read every line and map it to beats before designing anything.
+Before building any video, write a 5-line brief: goal, hook, proof, call to action, format. For the hook, pick 3 candidates from `references/viral-hooks.md` and let the user choose. Then confirm the plan with the user. **Understand the recording first**: transcribe it, read every line and map it to beats before designing anything.
 
 ## Mode A1: talking head
 

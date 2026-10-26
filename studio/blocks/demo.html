@@ -1,0 +1,115 @@
+<!doctype html>
+<!-- Demo and test of studio/blocks/pa-motion.js: one 2.4 s segment per block, 1080x1920.
+     Try it: copy this file as index.html and pa-motion.js into a blank HyperFrames project, then `npx hyperframes preview`. -->
+<html lang="en" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script src="pa-motion.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #141319; }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: Inter, system-ui, sans-serif; color: #141319; }
+      .seg, .scene, .world, .layer { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+      .seg { overflow: hidden; }
+      .pink { background: #F73186 radial-gradient(#141319 3px, transparent 3.5px) 0 0 / 44px 44px; }
+      .yellow { background: #FAE407 radial-gradient(#141319 3px, transparent 3.5px) 0 0 / 44px 44px; }
+      .lime { background: #BFF906 radial-gradient(#141319 3px, transparent 3.5px) 0 0 / 44px 44px; }
+      .card { position: absolute; left: 140px; width: 800px; padding: 60px; background: #fff; border: 12px solid #141319; border-radius: 36px; box-shadow: 18px 18px 0 #141319; text-align: center; }
+      .big { font-size: 220px; font-weight: 900; line-height: 1.1; letter-spacing: -0.04em; margin-bottom: 24px; }
+      .txt { font-size: 64px; font-weight: 800; line-height: 1.15; }
+      .tag { position: absolute; left: 50%; top: 190px; transform: translateX(-50%); z-index: 99; padding: 14px 34px; border-radius: 999px; background: #141319; color: #BFF906; font: 800 44px ui-monospace, monospace; white-space: nowrap; }
+      .mini { position: absolute; width: 220px; height: 220px; background: #fff; border: 8px solid #141319; border-radius: 24px; box-shadow: 8px 8px 0 #141319; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="28.8" data-width="1080" data-height="1920">
+      <div id="s0" class="seg clip" data-start="0" data-duration="2.4" data-track-index="0">
+        <div id="s0-cam" class="scene pink"><div class="card" style="top:640px"><div class="big">97%</div><div class="txt">of leads reply</div></div></div>
+        <div class="tag">snapZoom</div>
+      </div>
+      <div id="s1" class="seg clip" data-start="2.4" data-duration="2.4" data-track-index="0">
+        <div id="s1-world" class="world" style="height:3840px">
+          <div id="s1-back" class="layer yellow" style="height:3840px"></div>
+          <div id="s1-props" class="layer" style="height:3840px">
+            <div class="card" style="top:700px"><div class="txt">The roof</div></div>
+            <div class="card" style="top:1600px"><div class="txt">Floor 2</div></div>
+            <div class="card" style="top:2650px"><div class="txt">The basement</div></div>
+          </div>
+        </div>
+        <div class="tag">crane</div>
+      </div>
+      <div id="s2" class="seg clip" data-start="4.8" data-duration="2.4" data-track-index="0">
+        <div id="s2-cam" class="scene lime"><div class="card" style="top:700px"><div class="txt">Then the server went down</div></div></div>
+        <div class="tag">dutchTilt</div>
+      </div>
+      <div id="s3" class="seg clip" data-start="7.2" data-duration="2.4" data-track-index="0">
+        <div id="s3-cam" class="scene pink"></div>
+        <div class="tag">tiltShift</div>
+      </div>
+      <div id="s4" class="seg clip" data-start="9.6" data-duration="2.4" data-track-index="0">
+        <div id="s4-cam" class="scene yellow"><div class="card" style="top:700px"><div class="big">3x</div><div class="txt">faster replies</div></div></div>
+        <div class="tag">focusPulse</div>
+      </div>
+      <div id="s5" class="seg clip" data-start="12" data-duration="2.4" data-track-index="0">
+        <div id="s5-cam" class="scene lime"><div class="card" style="top:700px"><div class="big">$0</div><div class="txt">ad spend</div></div></div>
+        <div class="tag">focusHunt</div>
+      </div>
+      <div id="s6" class="seg clip" data-start="14.4" data-duration="2.4" data-track-index="0">
+        <div class="scene pink"><div class="card" style="top:700px"><div class="txt">Meanwhile, in the office</div></div></div>
+        <div class="tag">foregroundPass</div>
+      </div>
+      <div id="s7" class="seg clip" data-start="16.8" data-duration="2.4" data-track-index="0">
+        <div id="s7-cam" class="scene yellow"><div class="card" style="top:700px"><div class="txt">Your competitor's prices</div></div></div>
+        <div class="tag">povMask</div>
+      </div>
+      <div id="s8" class="seg clip" data-start="19.2" data-duration="2.4" data-track-index="0">
+        <div id="s8-world" class="world">
+          <div id="s8-back" class="layer lime"></div>
+          <div id="s8-mid" class="layer"><div class="card" style="top:760px"><div class="txt">Depth</div></div></div>
+          <div id="s8-front" class="layer"><div class="mini" style="left:60px;top:1350px"></div><div class="mini" style="left:800px;top:420px"></div></div>
+        </div>
+        <div class="tag">orbit</div>
+      </div>
+      <div id="s9" class="seg clip" data-start="21.6" data-duration="2.4" data-track-index="0">
+        <div id="s9-b" class="scene lime"><div class="card" style="top:700px"><div class="txt">Scene B</div></div></div>
+        <div id="s9-a" class="scene pink"><div class="card" style="top:700px"><div class="txt">Scene A</div></div></div>
+        <div class="tag">tapePull</div>
+      </div>
+      <div id="s10" class="seg clip" data-start="24" data-duration="2.4" data-track-index="0">
+        <div id="s10-b" class="scene yellow"><div class="card" style="top:700px"><div class="txt">Approved</div></div></div>
+        <div id="s10-a" class="scene lime"><div class="card" style="top:700px"><div class="txt">The verdict?</div></div></div>
+        <div class="tag">stampCut</div>
+      </div>
+      <div id="s11" class="seg clip" data-start="26.4" data-duration="2.4" data-track-index="0">
+        <div id="s11-b" class="scene pink"><div class="card" style="top:700px"><div class="txt">Step 2</div></div></div>
+        <div id="s11-a" class="scene yellow"><div class="card" style="top:700px"><div class="txt">Step 1</div></div></div>
+        <div class="tag">pageTurn</div>
+      </div>
+    </div>
+    <script>
+      // tiny cards for the tilt-shift set
+      var s3 = document.getElementById("s3-cam"), h = "";
+      for (var r = 0; r < 7; r++) for (var c = 0; c < 4; c++) h += '<div class="mini" style="left:' + (40 + c * 255) + "px;top:" + (60 + r * 265) + 'px"></div>';
+      s3.innerHTML = h;
+
+      const tl = gsap.timeline({ paused: true });
+      PA.snapZoom(tl, "#s0-cam", 0.6, { x: 540, y: 820 });
+      PA.crane(tl, "#s1-world", 2.4 + 0.3, { dur: 1.6, height: 1920, layers: [{ el: "#s1-back", z: 0 }, { el: "#s1-props", z: 0.5 }] });
+      PA.dutchTilt(tl, "#s2-cam", 4.8 + 0.4, { dur: 1.4, back: true });
+      PA.tiltShift(tl, "#s3", 7.2 + 0.2, {});
+      PA.focusPulse(tl, "#s4-cam", 9.6 + 0.6, {});
+      PA.focusHunt(tl, "#s5-cam", 12 + 0.3, { dur: 1.2, amount: 0.8, x: 540, y: 820 });
+      PA.foregroundPass(tl, "#s6", 14.4 + 0.4, { kind: "leaf" });
+      PA.povMask(tl, "#s7", 16.8 + 0.3, { kind: "binoculars", target: "#s7-cam", y: 820, dur: 1.7 });
+      PA.orbit(tl, [{ el: "#s8-back", z: 0 }, { el: "#s8-mid", z: 0.5 }, { el: "#s8-front", z: 1 }], 19.2 + 0.1, { dur: 2.2, yaw: 18, push: 1.1 });
+      PA.tapePull(tl, "#s9-a", "#s9-b", 21.6 + 0.9, { label: "NEXT" });
+      PA.stampCut(tl, "#s10-a", "#s10-b", 24 + 0.8, {});
+      PA.pageTurn(tl, "#s11-a", "#s11-b", 26.4 + 0.9, {});
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

@@ -9,6 +9,7 @@
 //   node reel.mjs build                       index.html + scenes + captions + SFX + music from reel.config.mjs
 //   node reel.mjs check                       hyperframes check (no GPU) -> errors / warnings
 //   node reel.mjs snap [t1,t2,...]            snapshots (default: middle of every scene) -> snapshots/
+//   node reel.mjs qa [from-to] [step]          dense time-labelled contact sheet of a range (any HyperFrames project) -> snapshots/qa-<from>-<to>/
 //   node reel.mjs render                      final MP4 -> renders/<name>.mp4, then verify
 //   node reel.mjs verify [file]               format, loudness, true peak, cut-boundary pops, cut contact sheet
 //   node reel.mjs all                         cut -> music -> build -> check -> render -> verify
@@ -167,6 +168,21 @@ const steps = {
     fs.rmSync(P("snapshots"), { recursive: true, force: true });
     hf(["snapshot", "--no-browser-gpu", "--no-end", "--at", times, "-o", "snapshots"]);
     say("look at snapshots/contact-sheet*.jpg");
+  },
+
+  // QA sheet (from papercut-explainer's qa.sh): every `step` s of a range, so fast moves and cuts that fall between scene snapshots show up.
+  // A cut: `qa 22.4-22.9 0.033` (every frame). A scene: its range, step ~ length / 6. Works on any HyperFrames project, no reel.config needed.
+  qa([range, step]) {
+    const root = fs.readFileSync(P("index.html"), "utf8").match(/<[^>]*data-composition-id="main"[^>]*>/)?.[0] || "";
+    const dur = +(root.match(/data-duration="([\d.]+)"/)?.[1] ?? NaN);
+    const [a, b] = range ? range.split("-").map(Number) : [0, dur];
+    if (!(b > a)) throw new Error("usage: qa [from-to] [step] - got range " + range + " (duration " + dur + ")");
+    const st = Math.max(1 / 30, +step || (b - a) / 24);
+    const times = []; for (let t = a; t <= b + 1e-6 && times.length < 60; t += st) times.push(t.toFixed(3));
+    const out = `snapshots/qa-${a}-${b}`;
+    fs.rmSync(P(out), { recursive: true, force: true });
+    hf(["snapshot", "--no-browser-gpu", "--no-end", "--describe", "false", "--at", times.join(","), "-o", out]);
+    say(`${times.length} frames - look at ${out}/contact-sheet*.jpg (each frame is labelled with its time)`);
   },
 
   async render() {

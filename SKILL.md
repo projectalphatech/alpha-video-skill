@@ -31,7 +31,7 @@ Before building any video, write a 5-line brief: goal, hook, proof, call to acti
 1. Run `init "<video>" <projectDir>`. Then set `face: {x, y}` from `assets/face-check.jpg`.
 2. Run `transcribe`. Read `transcript.md`: the transcript is the script. Add `fixes` and `merges` for misheard words.
 3. Plan the beats and one scene per beat with the user. Write the config.
-4. Run `cut`, then `music`, then `build`, then `check` (0 errors), then `snap`. Read the contact sheets and fix.
+4. Run `cut`, then `music`, then `build`, then `check` (0 errors), then `snap`. Read the contact sheets and fix. Check every cut and fast move frame by frame with `qa <from>-<to> 0.033`.
 5. Preview with `npx hyperframes preview`. Once the user approves, run `render`. It verifies loudness, true peak and pops at cuts.
 
 ## Mode A2: voice only
@@ -56,6 +56,7 @@ Engine: [HyperFrames](https://github.com/heygen-com/hyperframes) (`npx hyperfram
 
 Pipeline: story, then look, then build, then voice, then music, then beat grid, then SFX on cues, then check/snap, then the user's OK, then render (-14 LUFS).
 Use named camera moves instead of the word "cinematic": dolly push, crash zoom, slow orbit, whip pan.
+Camera moves and cuts by story beat: `references/camera-and-cuts.md`. The `PA.*` blocks (snap zoom, crane, dutch tilt, POV mask, tape pull, stamp cut...) live in `studio/blocks/pa-motion.js`; the reel engine loads them into every scene. The rest come from the registry.
 
 ## Toolbox
 

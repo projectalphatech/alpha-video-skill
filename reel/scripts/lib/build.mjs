@@ -6,6 +6,8 @@ import path from "node:path";
 
 export const DEFAULT_COLORS = { bg: "#0b141a", card: "#111b21", inBub: "#202c33", outBub: "#005c4b", green: "#25d366", ink: "#e9edef", mute: "#8696a0", red: "#ff4d5e", blue: "#2f7bff" };
 const GSAP = `<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>`;
+// camera moves and paper cuts (PA.snapZoom, PA.tapePull...), inlined into every scene: studio/blocks/pa-motion.js
+const MOTION = `<script>${fs.readFileSync(new URL("../../../studio/blocks/pa-motion.js", import.meta.url), "utf8")}</script>`;
 const clean = t => t.replace(/[،؟,.!?]/g, "");
 
 // Word lookups used by configs. at() searches from h.FROM (the current beat) so a word
@@ -53,6 +55,7 @@ function sceneFile(id, dur, base, css, html, js, lang) {
         <style>${base}${css}</style>
         <div class="stage" id="${id}-stage">${html}</div>
         ${GSAP}
+        ${MOTION}
         <script>
           (function () {
             var R = document.querySelector('[data-composition-id="${id}"]');

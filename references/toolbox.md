@@ -23,7 +23,16 @@ Verdict: **IN** = wired into this skill. **ENGINE** = installed plugin this skil
 | - | nyrahealth/CrisperWhisper | MIT code, **non-commercial weights** | REF | Best published filler capture, but client reels are commercial use. Arabic not proven. |
 | - | louisedesadeleer/cut-video, b2bvic/declip | MIT | REF | Ideas taken: browser review before render, never pad a cut into the next word. English-only fillers, macOS-first. |
 | 15 | [yt-dlp/yt-dlp](https://github.com/yt-dlp/yt-dlp) (+ `yt-dlp-ejs` YouTube solver, Node runtime) | Unlicense | IN | `tools/fetch_ref.py` (added 2026-10-26): downloads reference reels and our own posted videos from YouTube/Instagram/TikTok/Facebook/X as H.264 mp4. It then measures shot changes with ffmpeg (`cuts.txt`, `sheet.jpg`) so we can match the pacing. Third-party videos are study-only. Sites change often, so update monthly with `pip install -U "yt-dlp[default]"`. |
+| 16 | [Leonxlnx/earshot](https://github.com/Leonxlnx/earshot) (2.9k★, v0.4.0) | MIT | IN | Added 2026-10-27. Lets the agent hear audio, on CPU only. Installed at `~/.alpha-video/earshot` (Python 3.11 venv; models ~1.1 GB in `.cache/hf`). Run it with `~/.alpha-video/earshot/.venv/Scripts/python -m earshot <cmd>`. See "earshot for reels" below. |
 | 11 | ElevenLabs API | paid account | IN | `tools/eleven.py`: TTS (multilingual v2), sound generation and music. The key goes in `~/.alpha-video/.env`. |
+
+### earshot for reels
+
+- **SFX from code (no models, seconds):** `earshot sfx list` shows the 252-sound bank. `earshot sfx render whoosh_fast/crisp -o hit.wav --seed N --dur 0.6 --apex 0.3` renders one. A new `--seed` gives a new take of the same sound, which fits the fresh-SFX-per-video rule. `earshot kit init --preset launch` and then `kit render` render a whole film's set, with measured onset and peak times for placing on cuts.
+- **Check sync before posting:** `earshot timeline final.mp4` lists sound events next to the picture cuts and flags hits that land late. `earshot sheet final.mp4 -o sheet.png` draws the same as one image to read.
+- **Score a finished reel:** `earshot critique final.mp4` compares it with 7 professional launch films and gives timestamped fixes. That profile is for music-led launch films. For talking-head reels, treat its loudness and sync notes as useful and ignore the "launch style" ones.
+- **Pick between downloads:** `earshot rank "a soft paper swish" a.wav b.wav c.wav` sorts Openverse or ElevenLabs candidates. It overlaps with `tools/sfx_search.py`. Use sfx_search to search our library and earshot to choose between a few files.
+- Each CLI call takes 20-40 s to load the models, except `sfx`, `kit` and `measure`, which load none. For more than a few calls, run one Python script with `from earshot import api`, or add `earshot mcp` as an MCP server.
 
 ## Engines and helpers already installed (driven by this skill)
 

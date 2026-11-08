@@ -64,12 +64,16 @@ export function cut(proj, cfg) {
     t = b;
   }
   if (t < END) keep.push([t, END]);
+  // cut.drop: [[from, to], ...] source ranges removed on purpose (stutters, retakes)
+  const drops = C.drop || [];
+  for (const [d0, d1] of drops) keep = keep.flatMap(([a, b]) => d1 <= a || d0 >= b ? [[a, b]] : [[a, d0], [d1, b]].filter(([x, y]) => y - x > 0.05));
   keep = keep.filter(([a, b]) => b - a > 0.05).map(([a, b]) => [+a.toFixed(3), +b.toFixed(3)]);
 
   // Gate: every removed gap must be near-silent, or a letter is being cut off.
   const bad = [];
   for (let i = 0; i < keep.length - 1; i++) {
     const g0 = keep[i][1], g1 = keep[i + 1][0];
+    if (drops.some(([d0, d1]) => g0 <= d0 + 0.01 && g1 >= d1 - 0.01)) continue; // speech removed on purpose
     const db = maxDb(raw, g0, g1 - g0);
     if (db > C.gapMaxDb) bad.push({ gap: [g0, g1], db });
   }
@@ -80,6 +84,7 @@ export function cut(proj, cfg) {
   let words = [];
   for (let i = 0; i < rawWords.length; i++) {
     const w = rawWords[i];
+    if (drops.some(([a, b]) => w.start >= a - 0.01 && w.start < b - 0.01)) continue;
     const m = (cfg.merges || []).find(([x, y]) => w.text === x && rawWords[i + 1]?.text === y);
     if (m) { words.push({ text: m[2], start: w.start, end: rawWords[i + 1].end }); i++; continue; }
     words.push({ text: fixes[w.text] ?? w.text, start: w.start, end: w.end });
